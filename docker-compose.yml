@@ -1,6 +1,6 @@
 version : "3.3"
 services :
   web :
-     image : manishrlmra/notes-app-jenkins:latest
+     image : manishrlmra/notes-app:latest
      ports :
          - "8000:8000"
