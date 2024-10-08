@@ -1,45 +1,47 @@
+@Library("Shared") _
 pipeline {
     
-    agent { 
-        node{
-            label "dev"
-            
-        }
-    }
-    
-    stages{
-        stage("Clone Code"){
+    agent { label "vinod"}
+
+    stages {
+        
+        stage("hello"){
             steps{
-                git url: "https://github.com/LondheShubham153/django-notes-app.git", branch: "main"
-                echo "Aaj toh LinkedIn Post bannta hai boss"
+                script{
+                    hello()
+                }
             }
         }
-        stage("Build & Test"){
-            steps{
-                sh "docker build . -t notes-app-jenkins:latest"
+        stage('Code') {
+            steps {
+                script{
+                    clone( "https://github.com/Manish2408/django-notes-app.git","main")
+                }
             }
         }
-        stage("Push to DockerHub"){
-            steps{
-                withCredentials(
-                    [usernamePassword(
-                        credentialsId:"dockerCreds",
-                        passwordVariable:"dockerHubPass", 
-                        usernameVariable:"dockerHubUser"
-                        )
-                    ]
-                ){
-                sh "docker image tag notes-app-jenkins:latest ${env.dockerHubUser}/notes-app-jenkins:latest"
-                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker push ${env.dockerHubUser}/notes-app-jenkins:latest"
+        stage('Build') {
+            steps {
+                script{
+                    docker_build("notes-app","latest","manishrlmra")
+                }
+            }
+        }
+        stage('Push to dockerhub') {
+            steps {
+                script{
+                    docker_push("notes-app","latest","manishrlmra")
                 }
             }
         }
         
-        stage("Deploy"){
-            steps{
-                sh "docker compose up -d"
+        stage('Deploy') {
+            steps {
+                echo "This is deploy stage"
+                sh "docker compose down && docker compose up -d "
             }
         }
-    }
+            
 }
+}
+
+
